@@ -24,7 +24,8 @@ def isCovered(cp_bl, cp_tr, t1_bl, t1_tr, t2_bl, t2_tr):
                 return "COMPLETELY COVERED"
             else:
                 return "NOT COMPLETELY COVERED"
-
+        else:
+            return "NOT COMPLETELY COVERED"
     elif x3 >= x2:
         if x5 <= x1 and y5 <= y1 and x6 >= x2 and y6 >= y2:
             return "COMPLETELY COVERED"
