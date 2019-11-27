@@ -1,5 +1,4 @@
 def isCovered(cp_bl, cp_tr, t1_bl, t1_tr, t2_bl, t2_tr):
-    #Coal Pit
     x1, y1 = int(cp_bl[0]), int(cp_bl[1])
     x2, y2 = int(cp_tr[0]), int(cp_tr[1])
     
@@ -16,6 +15,12 @@ def isCovered(cp_bl, cp_tr, t1_bl, t1_tr, t2_bl, t2_tr):
 
     firstArea = (x2-x1) * (y2-y1) 
 
+        
+    if (x4 >= x2 and x3 <= x1 and y3 <= y1 and y4 >= y2) or (x5 <= x1 and y5 <= y1 and x6 >= x2 and y6 >= y2):
+        return "COMPLETELY COVERED"
+    else:
+         return "NOT COMPLETELY COVERED"
+         
     if y4 >= y2 and y3 <= y1 and x3 < x2: 
         coveredArea1 = (x2-x3) * (y2-y1)
         if y6 >= y2 and x5 <= x1 and y5 <= y1: 
@@ -26,31 +31,36 @@ def isCovered(cp_bl, cp_tr, t1_bl, t1_tr, t2_bl, t2_tr):
                 return "NOT COMPLETELY COVERED"
         else:
             return "NOT COMPLETELY COVERED"
-    elif x3 >= x2:
+    
+    if x3 >= x2:
         if x5 <= x1 and y5 <= y1 and x6 >= x2 and y6 >= y2:
             return "COMPLETELY COVERED"
+        else:
+            return "NOT COMPLETELY COVERED"
 
-    elif x6 <= x1: 
+    if x6 <= x1: 
         if x3 <= x1 and y3 <= y1 and x4 >= x2 and y4 >= y2:
             return "COMPLETELY COVERED"
+        else:
+            return "NOT COMPLETELY COVERED"
 
-    elif x3 <= x1 and x5 <= x1 and x6 >= x2 and x4 >= x2:
-        if y5 >= y3:
+    if (y3 >= y2 or y4 <= y1) and (y5 >= y2 or y6 <= y1):
+        return "NOT COMPLETELY COVERED"
+
+    if x3 <= x1 and x5 <= x1 and x6 >= x2 and x4 >= x2:
+        if y5 >= y3 and y6 <= y2 :
             coveredArea1 = (y2-y5) * (x2-x1)
             coveredArea2 = (y4-y1) * (x2-x1)
             if firstArea - (coveredArea1 + coveredArea2) <= 0:
                 return "COMPLETELY COVERED"
             else:
                 return "NOT COMPLETELY COVERED"
-        else:
+        elif y3 > y5 and y4 <= y2:
             coveredArea1 = (y2-y3) * (x2-x1)
             coveredArea2 = (y6-y1) * (x2-x1)
             if firstArea - (coveredArea1 + coveredArea2) <= 0:
                 return "COMPLETELY COVERED"
             else:
                 return "NOT COMPLETELY COVERED"
-    else:
-         return "NOT COMPLETELY COVERED"
+        
 
-
-print isCovered((4,3), (9,6), (7,2), (10,7), (4,2), (7,7))
