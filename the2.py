@@ -19,9 +19,9 @@ def isCovered(cp_bl, cp_tr, t1_bl, t1_tr, t2_bl, t2_tr):
     if (x4 >= x2 and x3 <= x1 and y3 <= y1 and y4 >= y2) or (x5 <= x1 and y5 <= y1 and x6 >= x2 and y6 >= y2):
         return "COMPLETELY COVERED"
 
-    elif y4 >= y2 and y3 <= y1 and x3 < x2: 
+    elif y4 >= y2 and y3 <= y1 and x3 <= x2 and x4 >= x2: 
         coveredArea1 = (x2-x3) * (y2-y1)
-        if y6 >= y2 and x5 <= x1 and y5 <= y1: 
+        if y6 >= y2 and x5 <= x1 and y5 <= y1 and x6 >= x1:
             coveredArea2 = (x6-x1) * (y2-y1)
             if firstArea - (coveredArea1 + coveredArea2) <= 0:
                 return "COMPLETELY COVERED"
@@ -46,14 +46,28 @@ def isCovered(cp_bl, cp_tr, t1_bl, t1_tr, t2_bl, t2_tr):
         return "NOT COMPLETELY COVERED"
 
     elif x3 <= x1 and x5 <= x1 and x6 >= x2 and x4 >= x2:
-        if y5 >= y3 and y6 <= y2 :
+        if (y5 >= y3 and y6 <= y2) and not (y3 < y5 < y6 < y2 or y5 < y3 < y4 < y2):
             coveredArea1 = (y2-y5) * (x2-x1)
             coveredArea2 = (y4-y1) * (x2-x1)
             if firstArea - (coveredArea1 + coveredArea2) <= 0:
                 return "COMPLETELY COVERED"
             else:
                 return "NOT COMPLETELY COVERED"
-        elif y3 > y5 and y4 <= y2:
+        elif (y3 >= y5 and y4 <= y2) and not (y3 < y5 < y6 < y2 or y5 < y3 < y4 < y2):
+            coveredArea1 = (y2-y3) * (x2-x1)
+            coveredArea2 = (y6-y1) * (x2-x1)
+            if firstArea - (coveredArea1 + coveredArea2) <= 0:
+                return "COMPLETELY COVERED"
+            else:
+                return "NOT COMPLETELY COVERED"
+        elif (y1 <= y5 <= y2 and y2 >= y4 >= y1 and not (y3 < y5 < y6 < y2 or y5 < y3 < y4 < y2)):
+            coveredArea1 = (y2-y5) * (x2-x1)
+            coveredArea2 = (y4-y1) * (x2-x1)
+            if firstArea - (coveredArea1 + coveredArea2) <= 0:
+                return "COMPLETELY COVERED"
+            else:
+                return "NOT COMPLETELY COVERED"
+        elif (y1 <= y3 <= y2 and y2 >= y6 >= y1 and not (y3 < y5 < y6 < y2 or y5 < y3 < y4 < y2)):
             coveredArea1 = (y2-y3) * (x2-x1)
             coveredArea2 = (y6-y1) * (x2-x1)
             if firstArea - (coveredArea1 + coveredArea2) <= 0:
@@ -64,4 +78,3 @@ def isCovered(cp_bl, cp_tr, t1_bl, t1_tr, t2_bl, t2_tr):
             return "NOT COMPLETELY COVERED"
     else:
         return "NOT COMPLETELY COVERED"
-
