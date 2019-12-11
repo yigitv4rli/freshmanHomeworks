@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8-*-
+
 r = open("examples/rules.txt","r")
 m = open("examples/map1.txt", "r")
 maps = m.readlines()
@@ -34,7 +37,20 @@ def location(row,column):
     else:
         return [maps[row-1][column-1], maps[row-1][column], maps[row-1][column+1], maps[row][column-1], maps[row][column+1], maps[row+1][column-1], maps[row+1][column], maps[row+1][column+1]]
         
+def change(maps):
+    last_version = []
+    for row in range(0,length_row):
+        row_by_row = []
+        for column in range(0,length_column):
+            if maps[row][column] == "-" and location(row,column).count("-") == 3:
+                row_by_row.append("*")
+            elif maps[row][column] == "*" and location(row,column).count("*") < 2:
+                row_by_row.append("-")
+            elif maps[row][column] == "*" and location(row,column).count("*") > 3:
+                row_by_row.append("-")
+            else:
+                row_by_row.append(maps[row][column])
+        last_version.append("".join(row_by_row)+"\n")
+    return last_version
 
-
-print location(0,4)
-print maps
+print change(maps)
