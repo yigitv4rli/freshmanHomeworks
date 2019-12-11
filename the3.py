@@ -42,7 +42,7 @@ def change(maps):
     for row in range(0,length_row):
         row_by_row = []
         for column in range(0,length_column):
-            if maps[row][column] == "-" and location(row,column).count("-") == 3:
+            if maps[row][column] == "-" and location(row,column).count("*") == 3:
                 row_by_row.append("*")
             elif maps[row][column] == "*" and location(row,column).count("*") < 2:
                 row_by_row.append("-")
@@ -53,4 +53,4 @@ def change(maps):
         last_version.append("".join(row_by_row)+"\n")
     return last_version
 
-print change(maps)
+print "".join(change(maps))
