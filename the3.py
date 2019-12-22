@@ -1,14 +1,28 @@
 #!/usr/bin/python
 # -*- coding: utf-8-*-
+import copy
+import sys
 
-r = open("examples/rules.txt","r")
-m = open("examples/map1.txt", "r")
-maps = m.readlines()
-rules = r.readlines()
+map_path = sys.argv[1]
+rules_path = sys.argv[2]
+generation = int(sys.argv[3])
+
+# Maps creating
+maps = []
+with open(map_path,'r') as map_data:
+    for line in map_data.readlines(): 
+        maps.append(line.strip())
+
+# Rules Creating
+rules = []
+with open(rules_path,'r') as rule_data:
+    for rule in rule_data.readlines(): 
+        rules.append(rule.strip())
+
 length_row = len(maps)
 length_column = len(maps[-1]) 
 
-def location(row,column):
+def location(maps, row, column):
     # Top left corner
     if row == 0 and column == 0: 
         return [maps[1][0], maps[1][1], maps[0][1]]
@@ -36,21 +50,49 @@ def location(row,column):
     # If in the middle 
     else:
         return [maps[row-1][column-1], maps[row-1][column], maps[row-1][column+1], maps[row][column-1], maps[row][column+1], maps[row+1][column-1], maps[row+1][column], maps[row+1][column+1]]
-        
-def change(maps):
-    last_version = []
-    for row in range(0,length_row):
-        row_by_row = []
-        for column in range(0,length_column):
-            if maps[row][column] == "-" and location(row,column).count("*") == 3:
-                row_by_row.append("*")
-            elif maps[row][column] == "*" and location(row,column).count("*") < 2:
-                row_by_row.append("-")
-            elif maps[row][column] == "*" and location(row,column).count("*") > 3:
-                row_by_row.append("-")
-            else:
-                row_by_row.append(maps[row][column])
-        last_version.append("".join(row_by_row)+"\n")
-    return last_version
 
-print "".join(change(maps))
+# This func tries each rule to specific column and row
+def rule_try(rules, species, row, column, maps):
+    for each in rules:
+        spec = each[0]
+        sign = each[1]
+        count = int(each[2])
+        make_it = each[3]
+        if species == spec:
+            if sign == "=" and location(maps,row,column).count("*") == count:
+                return make_it
+            elif sign == "<" and location(maps,row,column).count("*") < count:
+                return make_it
+            elif sign == ">" and location(maps,row,column).count("*") > count:
+                return make_it
+            else:
+                continue
+        else:
+            continue
+    else:
+        return species
+
+def change(maps, generation):
+    if generation != 0:
+        flip_flop = []
+        for row in range(0,length_row):
+            row_by_row = []
+            for column in range(0,length_column):
+                row_by_row.append(rule_try(rules, maps[row][column], row, column,maps))
+            flip_flop.append("".join(row_by_row))
+
+        i = 1
+        while i < generation:
+            maps = flip_flop[:]
+            flip_flop = []
+            for row in range(0,length_row):
+                row_by_row = []
+                for column in range(0,length_column):
+                    row_by_row.append(rule_try(rules, maps[row][column], row, column, maps))
+                flip_flop.append("".join(row_by_row))
+            i+=1
+        return flip_flop
+    else:
+        return maps
+
+print "\n".join(change(maps,generation))
