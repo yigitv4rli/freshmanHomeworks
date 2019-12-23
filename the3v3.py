@@ -65,15 +65,11 @@ def geneCreation(world, rules):
     return mid_gene
 
 def generationFinder(world, rules, generation):
-    if generation != 0:
-        mid_gene = geneCreation(world,rules)
-        i=1
-        while i < generation:
-            final_version = mid_gene
-            mid_gene = geneCreation(final_version, rules)
-            i+=1
-        return normalizer(mid_gene)
-    else:
-        return normalizer(world)
+    i = 0
+    while i < generation:
+        mid_gene = world
+        world = geneCreation(mid_gene, rules)
+        i+=1
+    return normalizer(world)
 
 print "\n".join(generationFinder(world, rules, generation))
