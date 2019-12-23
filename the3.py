@@ -23,8 +23,27 @@ length_row = len(maps)
 length_column = len(maps[-1]) 
 
 def location(maps, row, column):
+    # If 1*1 matrix
+    if length_row == 1 and length_column == 1:
+        return [maps[row][column]]
+    # If 1*x matrix
+    elif length_row == 1:
+        if column == 0:
+            return [maps[row][column+1]]
+        elif column != 0 and column != length_column -1:
+            return [maps[row][column-1], maps[row][column+1]]
+        else:
+            return [maps[row][column-1]]
+    # If x*1 matrix
+    elif length_column == 1:
+        if row == 0:
+            return [maps[row+1][column]]
+        elif row != 0 and row != length_row -1:
+            return [maps[row-1][column], maps[row+1][column]]
+        else:
+            return [maps[row-1][column]]
     # Top left corner
-    if row == 0 and column == 0: 
+    elif row == 0 and column == 0: 
         return [maps[1][0], maps[1][1], maps[0][1]]
     # Top row edge
     elif row == 0 and (column != 0 and column != length_column -1):
@@ -52,7 +71,7 @@ def location(maps, row, column):
         return [maps[row-1][column-1], maps[row-1][column], maps[row-1][column+1], maps[row][column-1], maps[row][column+1], maps[row+1][column-1], maps[row+1][column], maps[row+1][column+1]]
 
 # This func tries each rule to specific column and row
-def rule_try(rules, species, row, column, maps):
+def rule_try(rules, species, row, column, maps): 
     for each in rules:
         spec = each[0]
         sign = each[1]
@@ -83,7 +102,7 @@ def change(maps, generation):
 
         i = 1
         while i < generation:
-            maps = flip_flop[:]
+            maps = copy.deepcopy(flip_flop)
             flip_flop = []
             for row in range(0,length_row):
                 row_by_row = []
@@ -95,4 +114,4 @@ def change(maps, generation):
     else:
         return maps
 
-print "\n".join(change(maps,generation))
+print "\n".join(change(maps, generation))
