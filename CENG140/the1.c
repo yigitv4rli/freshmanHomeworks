@@ -10,18 +10,6 @@ int curr_loop = 0;
 int compare[1];
 
 
-void loop_execute(void){
-    printf("X:%d r:%d Y:%d\n",
-           loop_variable_value('X'),
-           loop_variable_value('r'),
-           loop_variable_value('Y'));
-    if ((loop_variable_value('X')+loop_variable_value('r')+loop_variable_value('Y')) % 5 == 0) { 
-        printf("JUST MAGIC OF FIVE HAPPENED!...Continuing with next ’r’ value.\n");
-        loop_continue('r'); 
-    }
-}
-
-
 int side_finder(int a) { // (WORKS)
     if (start_values[a] > end_values[a]) {
         return 0;
@@ -41,7 +29,6 @@ int loop_variable_value(char c) {
     }
 }
 
-// Pointer make sense since we are changing the values? Or can we use arrays as pointers since it include pointers
 void next_value(char c) {
     int index;
     compare[0] = 1;
@@ -104,25 +91,24 @@ int main() {
 
        } else {
             ungetc(ch, stdin);
-       }
 
-        scanf(" %c", &curr_variable);
-        variables[curr_loop] = curr_variable;
+            scanf(" %c", &curr_variable);
+            variables[curr_loop] = curr_variable;
 
-        scanf(" %d %d %d", &curr_start, &curr_end, &curr_step);
-        if (check_conditions(curr_start, curr_end, curr_step) == 1) {
-           goto finish;
+            scanf(" %d %d %d", &curr_start, &curr_end, &curr_step);
+            if (check_conditions(curr_start, curr_end, curr_step) == 1) {
+                goto finish;
 
-       } else { 
-            start_values[curr_loop] = curr_start;
-            end_values[curr_loop] = curr_end;
-            step_sizes[curr_loop] = curr_step;
-            curr_values[curr_loop] = curr_start;
-            curr_loop++;
+            } else { 
+                start_values[curr_loop] = curr_start;
+                end_values[curr_loop] = curr_end;
+                step_sizes[curr_loop] = curr_step;
+                curr_values[curr_loop] = curr_start;
+                curr_loop++;
+            }
        }
     }
 
-    curr_loop--;
     
     while (1) {
         if (side_finder(0) == 1 && curr_values[0] > end_values[0]) {
