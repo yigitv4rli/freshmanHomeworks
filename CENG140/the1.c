@@ -10,7 +10,7 @@ int curr_loop = 0;
 int compare[1];
 
 
-int side_finder(int a) { // Check this equality conditions
+int side_finder(int a) {
     if (start_values[a] > end_values[a]) {
         return 0;
     } else if (start_values[a] < end_values[a]) {
@@ -20,7 +20,7 @@ int side_finder(int a) { // Check this equality conditions
     }
 }
 
-// Using for loop to find index in variables, then curr_values[index] = loop variable value (WORKS)
+
 int loop_variable_value(char c) {
     int index;
 
@@ -62,7 +62,7 @@ void next_value(char c) {
     }
 }
 
-void loop_continue(char c) {  // Check this func
+void loop_continue(char c) {
     int index;
 
     for (index = 0; index < curr_loop; index++) {
@@ -86,7 +86,7 @@ int check_conditions(int start, int end, int step) {
     }
 }
 
-// Main function starts
+
 int main() {
     while (1) {
         int ch = getchar();
@@ -113,7 +113,6 @@ int main() {
         }
     }
 
-    curr_loop--;
 
     while (1) {
         if (side_finder(0) == 1 && curr_values[0] > end_values[0]) {
