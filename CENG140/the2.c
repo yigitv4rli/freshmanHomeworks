@@ -120,9 +120,67 @@ void R2CommaReplacer(char ***mainArray, int mainIndex, char **equation, int side
 }
 
 
+void R5Transformer(char **equation, int indexInEquation, int operatorIndex) {
+    char *transformed;
+    int formulaLength = strlen(equation[indexInEquation]);
+
+    if (equation[indexInEquation][1] == '-') {
+        int i = 0, k = 0;
+        transformed = (char*) malloc((formulaLength) * sizeof(char));
+
+        while (i < formulaLength+1) {
+            if (i == 1) {
+                i++;
+            } else if (i == operatorIndex) {
+                transformed[k] = '|';
+                i++;
+                k++;
+            } else {
+                transformed[k] = equation[indexInEquation][i];
+                i++;
+                k++;
+            }
+        }
+
+    } else {
+        int i = 0, k = 0;
+        transformed = (char*) malloc((formulaLength+2) * sizeof(char));
+
+        while (i < formulaLength + 2) {
+            if (i == 1) {
+                transformed[i] = '-';
+                i++;
+            } else if (k == operatorIndex) {
+                transformed[i] = '|';
+                i++;
+                k++;
+            } else {
+                transformed[i] = equation[indexInEquation][k];
+                i++;
+                k++;
+            }
+        }
+    }
+
+    free(equation[indexInEquation]);
+    equation[indexInEquation] = transformed;
+}
+
+
+
+
 
 /* side = -1 -> Left */
 /* side = 1 -> Right */
+/*
+    mainArray = futureSolved
+    mainIndex = while looping in futuresolved, store index
+    equation = futureSolved[mainIndex]
+    indexInEquation = storing index while looping in equation
+    word = equation[index] = futureSolved[mainIndex][indexInEquation]
+    side = left or right implication
+*/
+
 void operandProcessor(char ***mainArray, int mainIndex, char **equation ,char *word, int side, int indexInEquation) {
     int length = strlen(word);
 
@@ -148,7 +206,7 @@ void operandProcessor(char ***mainArray, int mainIndex, char **equation ,char *w
 
                 } else if (word[index] == '>' && parentheses == 0) {
                     operator = index;
-                    R5Transformfer(word, operator); /* RULE 5 -> A>B transforms to -A|B       A: [1: operator]    B: [operator+1: length-1] */
+                    R5Transformer(equation, indexInEquation ,operator); /* RULE 5 -> A>B transforms to -A|B       A: [1: operator]    B: [operator+1: length-1] */
 
                 } else if (word[index] == '|' && side == -1 && parentheses == 0) {
                     operator = index;
