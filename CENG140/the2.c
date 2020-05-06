@@ -7,7 +7,17 @@ char inComing[201];
 char ***futureSolved;
 char **firstEquation;
 
-/* WORKS */
+/*
+R1 -> Done 
+R2 -> Done
+R3 -> ToBeDone
+R4 -> ToBeDone
+R5 -> InProgress
+Checker -ToBeDone
+Connection -> ToBeDone
+*/
+
+
 void R1SideChanger(char **equation, int side, int indexInEquation) {
     int i, j, lenEquation = 0, wordLength = strlen(equation[indexInEquation]);
     char *value = (char*) malloc(wordLength * sizeof(char));
@@ -41,16 +51,79 @@ void R1SideChanger(char **equation, int side, int indexInEquation) {
     }
 }
 
-void R2CommaReplacer(equation, side, indexInEquation) {
 
-    
+void R2CommaReplacer(char ***mainArray, int mainIndex, char **equation, int side, int indexInEquation, int operatorIndex) {
+    int i, j, lenEquation = 0;
+    int formulaLength = strlen(equation[indexInEquation]);
+    int firstLength = operatorIndex - 0, secondLength = formulaLength - operatorIndex -1;
+    char *firstPhrase;
+    char *secondPhrase;
+    char **newEquation;
+
+    firstPhrase = (char*) malloc(firstLength * sizeof(char));
+    secondPhrase = (char*) malloc(secondLength * sizeof(char));
+
+    while (equation[lenEquation] != NULL) {
+        lenEquation++;
+    }
+
+    for (i = 0; i < operatorIndex-1; i++) {
+        firstPhrase[i] = equation[indexInEquation][i+1];
+    }
+    firstPhrase[i] = '\0';
+
+    for (j= 0; j < formulaLength - operatorIndex -2; j++) {
+        secondPhrase[j] = equation[indexInEquation][j+operatorIndex+1];
+    }
+    secondPhrase[j] = '\0';
+
+
+    newEquation = (char**) malloc((lenEquation+2) * sizeof(char*));
+
+    if (side == -1) {
+        int k = 0, l=0;
+        newEquation[0] = firstPhrase;
+        newEquation[1] = secondPhrase;
+
+        while (k < lenEquation) {
+            if (l != indexInEquation){
+                newEquation[k+2] = equation[l];
+                l++;
+                k++;
+            } else {
+                l++;
+            }
+        }
+        free(equation[indexInEquation]); /* It can give invalid free error IMPORTANT!!! */
+        free(mainArray[mainIndex]);
+        mainArray[mainIndex] = newEquation;
+
+    } else if (side == 1) {
+        int k = 0, l = 0;
+        newEquation[lenEquation+1] = NULL;
+        newEquation[lenEquation] = firstPhrase;
+        newEquation[lenEquation-1] = secondPhrase;
+
+        while (k < lenEquation-1) {
+            if (l != indexInEquation){
+                newEquation[k] = equation[l];
+                l++;
+                k++;
+            } else {
+                l++;
+            }
+        }
+        free(equation[indexInEquation]);
+        free(mainArray[mainIndex]);
+        mainArray[mainIndex] = newEquation;
+    }
 }
 
 
 
 /* side = -1 -> Left */
 /* side = 1 -> Right */
-void operandProcessor(char **equation ,char *word, int side, int indexInEquation) {
+void operandProcessor(char ***mainArray, int mainIndex, char **equation ,char *word, int side, int indexInEquation) {
     int length = strlen(word);
 
     if (length == 1){
@@ -87,11 +160,11 @@ void operandProcessor(char **equation ,char *word, int side, int indexInEquation
                 
                 } else if (word[index] == '&' && side == -1 && parentheses == 0) {
                     operator = index;
-                    R2CommaReplacer(equation, side, indexInEquation); /* RULE 2 Left -> A&B becomes A, B */
+                    R2CommaReplacer(mainArray, mainIndex, equation, side, indexInEquation, operator); /* RULE 2 Left -> A&B becomes A, B */
 
                 } else if(word[index] == '|' && side == 1 && parentheses == 0) {
                     operator = index;
-                    R2CommaReplacer(word,operator); /* RULE 2 Right -> A|B becomes A, B */
+                    R2CommaReplacer(mainArray, mainIndex, equation, side, indexInEquation, operator);; /* RULE 2 Right -> A|B becomes A, B */
                 }
             }
         }
