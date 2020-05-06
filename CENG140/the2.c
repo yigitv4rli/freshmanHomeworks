@@ -7,22 +7,63 @@ char inComing[201];
 char ***futureSolved;
 char **firstEquation;
 
+/* WORKS */
+void R1SideChanger(char **equation, int side, int indexInEquation) {
+    int i, j, lenEquation = 0, wordLength = strlen(equation[indexInEquation]);
+    char *value = (char*) malloc(wordLength * sizeof(char));
+
+    for (j=0; j< wordLength; j++) {
+        value[j] = equation[indexInEquation][j+1];
+    }
+
+    while (equation[lenEquation] != NULL) {
+        lenEquation++;
+    }
+
+    free(equation[indexInEquation]);
+    equation[indexInEquation] = NULL;
+
+    if (side == -1) {
+        for (i = 0; i < lenEquation-1; i++) {
+            if (i >= indexInEquation) {
+                equation[i] = equation[i+1];
+            }
+        }
+        equation[lenEquation-1]  = value;
+
+    } else if (side == 1) {
+        for (i = lenEquation-1; i > 0; i--) {
+            if (i <= indexInEquation) {
+                equation[i] = equation[i-1];
+            }
+        }
+        equation[0] = value;
+    }
+}
+
+void R2CommaReplacer(equation, side, indexInEquation) {
+
+    
+}
+
+
+
 /* side = -1 -> Left */
 /* side = 1 -> Right */
-void operandProcessor(char *word, int side) {
+void operandProcessor(char **equation ,char *word, int side, int indexInEquation) {
     int length = strlen(word);
 
     if (length == 1){
         return;
 
     } else if (length == 2) {
-        R1SideChanger(word, side);  /* RULE 1  if there is - take it to other side  */
+        R1SideChanger(equation, side, indexInEquation);  /* RULE 1  if there is - take it to other side  */
 
     } else {
         int index = 0, parentheses = -1, operator;
         
         if (word[0] == '-') {
-            R1SideChanger(word, side); /* RULE 1 again -> Take it to other side */
+            R1SideChanger(equation, side, indexInEquation); /* RULE 1 again -> Take it to other side */
         } else {
             while (index < length) {
                 if (word[index] == '(') {
@@ -46,7 +87,7 @@ void operandProcessor(char *word, int side) {
                 
                 } else if (word[index] == '&' && side == -1 && parentheses == 0) {
                     operator = index;
-                    R2CommaReplacer(word, operator); /* RULE 2 Left -> A&B becomes A, B */
+                    R2CommaReplacer(equation, side, indexInEquation); /* RULE 2 Left -> A&B becomes A, B */
 
                 } else if(word[index] == '|' && side == 1 && parentheses == 0) {
                     operator = index;
@@ -116,7 +157,7 @@ int main() {
 
             } else {
                 char *hashtag;
-                
+
                 hashtag = (char*) malloc(2* sizeof(char));
                 hashtag[0] = '#';
                 hashtag[1] = '\0';
