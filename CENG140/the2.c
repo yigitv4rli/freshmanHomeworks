@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int toBeSolved = 1, solved = 0, failed = 0;
+int ssf[3] = {1,0,0};
 char inComing[201];
 char ***futureSolved;
 char **firstEquation;
@@ -10,14 +10,14 @@ char **firstEquation;
 /*
 R1 -> Done 
 R2 -> Done
-R3 -> ToBeDone
-R4 -> ToBeDone
-R5 -> InProgress
+R3_R4 -> Done
+R5 -> Done
 Checker -ToBeDone
 Connection -> ToBeDone
 */
 
-
+/* -------------------------------------------------------------*/
+/* -------------------------R1 R1 R1 R1------------------------ */
 void R1SideChanger(char **equation, int side, int indexInEquation) {
     int i, j, lenEquation = 0, wordLength = strlen(equation[indexInEquation]);
     char *value = (char*) malloc(wordLength * sizeof(char));
@@ -50,8 +50,8 @@ void R1SideChanger(char **equation, int side, int indexInEquation) {
         equation[0] = value;
     }
 }
-
-
+/*-------------------------------------------------------------------------------------------------------------------- */
+/*-------------------------------------------------- R2 R2 R2 R2------------------------------------------------------ */
 void R2CommaReplacer(char ***mainArray, int mainIndex, char **equation, int side, int indexInEquation, int operatorIndex) {
     int i, j, lenEquation = 0;
     int formulaLength = strlen(equation[indexInEquation]);
@@ -118,8 +118,66 @@ void R2CommaReplacer(char ***mainArray, int mainIndex, char **equation, int side
         mainArray[mainIndex] = newEquation;
     }
 }
+/* --------------------------------------------------------------------------------------------------------------*/
+/* --------------------------------------------- R3_R4 Sequence Creator----------------------------------------- */
+void R3_R4SequenceCreator(char ***mainArray, int mainIndex, char **equation, int indexInEquation, int operatorIndex) {
+    char **createdSeq;
+    char *createdFormula;
+    int equationLength = 0, i;
+
+    while (equation[equationLength] != NULL) {
+        equationLength++;
+    }
+    createdSeq = (char**) malloc((equationLength+1) * sizeof(char*));
+
+    for (i = 0; i < equationLength; i++) {
+        char* uniqueString;
+        if (i != indexInEquation) {
+            int lenWord = strlen(equation[i]), j;
+
+            uniqueString = (char*) malloc((lenWord+ 1) * sizeof(char));
+            for (j = 0; j < lenWord +1 ; j++) {
+                uniqueString[j] = equation[i][j];
+            }
+            createdSeq[i] = uniqueString;
+
+        } else if (i == indexInEquation) {
+            int lenWord = strlen(equation[indexInEquation]), j;
+
+            uniqueString = (char*) malloc((lenWord-operatorIndex-1) * sizeof(char));
+
+            for (j = 0; j < lenWord-operatorIndex-2; j++) {
+                uniqueString[j] = equation[indexInEquation][j+operatorIndex+1];
+            }
+            uniqueString[j] = '\0';
+            createdSeq[indexInEquation] = uniqueString;
+        }
+    }
+    createdSeq[i] = NULL; /* New sequent created. Do not forget to realloc and put it into last index */
+
+    createdFormula = (char*) malloc((operatorIndex) * sizeof(char));
+
+    for (i = 0; i < operatorIndex-1; i++) {
+        createdFormula[i] = equation[indexInEquation][i+1];
+    }
+    createdFormula[i] = '\0';
+
+    free(equation[indexInEquation]);
+    equation[indexInEquation] = createdFormula;  /*I put it into first array at same index and make old index free */
+
+    
+    ssf[0]++;
+    futureSolved = (char***) realloc(futureSolved, ssf[0]* sizeof(char**));
+    futureSolved[ssf[0] -1] = createdSeq;
+
+}
 
 
+
+
+
+/*----------------------------------------------------------------------------- */
+/*------------------------------ R5 R5 R5 R5 ---------------------------------- */
 void R5Transformer(char **equation, int indexInEquation, int operatorIndex) {
     char *transformed;
     int formulaLength = strlen(equation[indexInEquation]);
@@ -169,7 +227,6 @@ void R5Transformer(char **equation, int indexInEquation, int operatorIndex) {
 
 
 
-
 /* side = -1 -> Left */
 /* side = 1 -> Right */
 /*
@@ -180,6 +237,7 @@ void R5Transformer(char **equation, int indexInEquation, int operatorIndex) {
     word = equation[index] = futureSolved[mainIndex][indexInEquation]
     side = left or right implication
 */
+
 
 void operandProcessor(char ***mainArray, int mainIndex, char **equation ,char *word, int side, int indexInEquation) {
     int length = strlen(word);
@@ -210,11 +268,11 @@ void operandProcessor(char ***mainArray, int mainIndex, char **equation ,char *w
 
                 } else if (word[index] == '|' && side == -1 && parentheses == 0) {
                     operator = index;
-                    R3SequenceCreator(word, operator); /* RULE 3  Left -> A|B splits into two new strings one involves A, the other involves B, The others are same for each one */
+                    R3_R4SequenceCreator(mainArray, mainIndex, equation, indexInEquation, operator); /* RULE 3  Left -> A|B splits into two new strings one involves A, the other involves B, The others are same for each one */
                 
                 } else if (word[index] == '&' && side == 1 && parentheses == 0) {
                     operator = index;
-                    R4SequenceCreator(word, operator); /* RULE 4  Right -> A&B splits into two new strings one involves A, the other involves B, The others are same for each one */
+                    R3_R4SequenceCreator(mainArray, mainIndex, equation, indexInEquation, operator); /* RULE 4  Right -> A&B splits into two new strings one involves A, the other involves B, The others are same for each one */
                 
                 } else if (word[index] == '&' && side == -1 && parentheses == 0) {
                     operator = index;
@@ -229,8 +287,8 @@ void operandProcessor(char ***mainArray, int mainIndex, char **equation ,char *w
     }
 
 }
-
-
+/* ------------------------------------------------------------------------------------ */
+/* ------------------------------------- Main ----------------------------------------- */
 int main() {
     int comma = 0, i = 0;
     int opening = 0, closing, arrIndex = 0;
