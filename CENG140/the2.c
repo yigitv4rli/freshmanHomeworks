@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int ssf[3] = {1,0,0};
+int ssf[2] = {1,0};
 char inComing[201];
 char ***futureSolved;
 char **firstEquation;
@@ -245,6 +245,7 @@ int checker(char **equation) {
         for (i = 0; i < hashtagIndex; i++) {
             for (j = hashtagIndex+1; j < lenEquation; j++) {
                 if (strcmp(equation[i], equation[j]) == 0) {
+                    ssf[1]++;
                     return 1;
                 }
             }
@@ -255,6 +256,7 @@ int checker(char **equation) {
         for (i = 0; i < hashtagIndex; i++) {
             for (j = hashtagIndex+1; j < lenEquation; j++) {
                 if (strcmp(equation[i], equation[j]) == 0) {
+                    ssf[1]++;
                     return 1;
                 }
             }
@@ -320,6 +322,8 @@ void operandProcessor(char ***mainArray, int mainIndex, char **equation ,char *w
                 } else if(word[index] == '|' && side == 1 && parentheses == 0) {
                     operator = index;
                     R2CommaReplacer(mainArray, mainIndex, equation, side, indexInEquation, operator);; /* RULE 2 Right -> A|B becomes A, B */
+                } else {
+                    index++;
                 }
             }
         }
@@ -329,6 +333,7 @@ void operandProcessor(char ***mainArray, int mainIndex, char **equation ,char *w
 /* ------------------------------------------------------------------------------------ */
 /* ------------------------------------- Main ----------------------------------------- */
 int main() {
+    int futureIndex = 0, equationIndex;
     int comma = 0, i = 0;
     int opening = 0, closing, arrIndex = 0;
 
@@ -412,5 +417,35 @@ int main() {
     
     futureSolved[0] = firstEquation;
 
+
+    while (ssf[1] < ssf[0]) {
+        while (futureIndex < ssf[0]) {
+            int LR = -1;
+            for (equationIndex = 0; futureSolved[futureIndex][equationIndex] != NULL; equationIndex++) {
+                int result;
+
+                printf("%s\n", futureSolved[futureIndex][equationIndex]);
+
+                if (futureSolved[futureIndex][equationIndex][0] == '#') {
+                    LR = 1;
+                }
+
+                operandProcessor(futureSolved, futureIndex, futureSolved[futureIndex], futureSolved[futureIndex][equationIndex], LR, equationIndex);
+                result = checker(futureSolved[futureIndex]);
+
+                if (result == 1) {
+                    futureIndex++;
+                } else if (result == -1) {
+                    printf("F\n");
+                    return 0;
+                }
+            }
+        }
+    }
+    /* DO NOT FORGET CLEANER FUNCTION */
+
+    printf("T\n");
+
     return 0;
 }
+
