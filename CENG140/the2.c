@@ -173,9 +173,6 @@ void R3_R4SequenceCreator(char ***mainArray, int mainIndex, char **equation, int
 }
 
 
-
-
-
 /*----------------------------------------------------------------------------- */
 /*------------------------------ R5 R5 R5 R5 ---------------------------------- */
 void R5Transformer(char **equation, int indexInEquation, int operatorIndex) {
@@ -222,6 +219,48 @@ void R5Transformer(char **equation, int indexInEquation, int operatorIndex) {
 
     free(equation[indexInEquation]);
     equation[indexInEquation] = transformed;
+}
+
+/* -------------------------------------------------------------------------------------------------------- */
+/* ------------------------------------ Check Whether Solved or Failed ------------------------------------ */
+int checker(char **equation) {
+    int lenEquation = 0, hashtagIndex, numberStr = 0;
+    int i, j;
+
+    while (equation[lenEquation] != NULL) {
+        if (strlen(equation[lenEquation]) == 1) {
+            numberStr++;
+        }
+
+        if (equation[lenEquation][0] == '#'){
+            hashtagIndex = lenEquation;
+        }
+        lenEquation++;
+    }
+
+    if (lenEquation == numberStr && (equation[0][0] == '#' | equation[lenEquation-1][0] == '#')) {
+        return -1;
+
+    } else if (lenEquation == numberStr) {
+        for (i = 0; i < hashtagIndex; i++) {
+            for (j = hashtagIndex+1; j < lenEquation; j++) {
+                if (strcmp(equation[i], equation[j]) == 0) {
+                    return 1;
+                }
+            }
+        }
+        return -1;
+
+    } else {
+        for (i = 0; i < hashtagIndex; i++) {
+            for (j = hashtagIndex+1; j < lenEquation; j++) {
+                if (strcmp(equation[i], equation[j]) == 0) {
+                    return 1;
+                }
+            }
+        }
+        return 0;
+    }
 }
 
 
