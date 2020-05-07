@@ -280,20 +280,22 @@ int checker(char **equation) {
 */
 
 
-void operandProcessor(char ***mainArray, int mainIndex, char **equation ,char *word, int side, int indexInEquation) {
+int operandProcessor(char ***mainArray, int mainIndex, char **equation ,char *word, int side, int indexInEquation) {
     int length = strlen(word);
 
     if (length == 1){
-        return;
+        return 1;
 
     } else if (length == 2) {
         R1SideChanger(equation, side, indexInEquation);  /* RULE 1  if there is - take it to other side  */
+        return 0;
 
     } else {
         int index = 0, parentheses = -1, operator;
         
         if (word[0] == '-') {
             R1SideChanger(equation, side, indexInEquation); /* RULE 1 again -> Take it to other side */
+            return 0;
         } else {
             while (index < length) {
                 if (word[index] == '(') {
@@ -306,29 +308,34 @@ void operandProcessor(char ***mainArray, int mainIndex, char **equation ,char *w
                 } else if (word[index] == '>' && parentheses == 0) {
                     operator = index;
                     R5Transformer(equation, indexInEquation ,operator); /* RULE 5 -> A>B transforms to -A|B       A: [1: operator]    B: [operator+1: length-1] */
+                    return 1;
 
                 } else if (word[index] == '|' && side == -1 && parentheses == 0) {
                     operator = index;
                     R3_R4SequenceCreator(mainArray, mainIndex, equation, indexInEquation, operator); /* RULE 3  Left -> A|B splits into two new strings one involves A, the other involves B, The others are same for each one */
-                
+                    return 0;
+
                 } else if (word[index] == '&' && side == 1 && parentheses == 0) {
                     operator = index;
                     R3_R4SequenceCreator(mainArray, mainIndex, equation, indexInEquation, operator); /* RULE 4  Right -> A&B splits into two new strings one involves A, the other involves B, The others are same for each one */
-                
+                    return 0;
+
                 } else if (word[index] == '&' && side == -1 && parentheses == 0) {
                     operator = index;
                     R2CommaReplacer(mainArray, mainIndex, equation, side, indexInEquation, operator); /* RULE 2 Left -> A&B becomes A, B */
+                    return 0;
 
                 } else if(word[index] == '|' && side == 1 && parentheses == 0) {
                     operator = index;
                     R2CommaReplacer(mainArray, mainIndex, equation, side, indexInEquation, operator);; /* RULE 2 Right -> A|B becomes A, B */
+                    return 0;
+
                 } else {
                     index++;
                 }
             }
         }
     }
-
 }
 /* ------------------------------------------------------------------------------------ */
 /* ------------------------------------- Main ----------------------------------------- */
@@ -420,25 +427,29 @@ int main() {
 
     while (ssf[1] < ssf[0]) {
         while (futureIndex < ssf[0]) {
-            int LR = -1;
+            int LR = -1, result;
             for (equationIndex = 0; futureSolved[futureIndex][equationIndex] != NULL; equationIndex++) {
-                int result;
-
-                printf("%s\n", futureSolved[futureIndex][equationIndex]);
+                int op;
 
                 if (futureSolved[futureIndex][equationIndex][0] == '#') {
+                    printf("%s %d %d\n", futureSolved[futureIndex][equationIndex], equationIndex, futureIndex);
                     LR = 1;
-                }
+                } else {
+                    printf("%s %d %d\n", futureSolved[futureIndex][equationIndex],equationIndex, futureIndex);
+                    op = operandProcessor(futureSolved, futureIndex, futureSolved[futureIndex], futureSolved[futureIndex][equationIndex], LR, equationIndex);
+                    printf("%s %d %d\n", futureSolved[futureIndex][equationIndex],equationIndex, futureIndex);
+                    if (op == 0) {
+                        break;
+                    }
+                }           
+            }
+            result = checker(futureSolved[futureIndex]);
 
-                operandProcessor(futureSolved, futureIndex, futureSolved[futureIndex], futureSolved[futureIndex][equationIndex], LR, equationIndex);
-                result = checker(futureSolved[futureIndex]);
-
-                if (result == 1) {
-                    futureIndex++;
-                } else if (result == -1) {
-                    printf("F\n");
-                    return 0;
-                }
+            if (result == 1) {
+                futureIndex++;
+            } else if (result == -1) {
+                printf("F\n");
+                return 0;
             }
         }
     }
