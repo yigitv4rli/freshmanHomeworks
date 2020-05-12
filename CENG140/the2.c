@@ -338,11 +338,13 @@ int operandProcessor(char ***mainArray, int mainIndex, char **equation ,char *wo
         }
     }
 }
+
+
 /* ------------------------------------------------------------------------------------ */
 /* ------------------------------------- Main ----------------------------------------- */
 int main() {
     int futureIndex = 0, equationIndex, lenComing;
-    int comma = 0, i = 0, pFirst = 0, pSec = 0, minuss = 0;
+    int comma = 0, i = 0;
     int opening = 0, closing, arrIndex = 0;
 
     futureSolved = (char ***) malloc(1*sizeof(char**)); /* At first we have only one equation so.. AND array size == TOBESOLVED*/
