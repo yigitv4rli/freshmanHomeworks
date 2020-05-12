@@ -12,8 +12,9 @@ R1 -> Done
 R2 -> Done
 R3_R4 -> Done
 R5 -> Done
-Checker -ToBeDone
-Connection -> ToBeDone
+Checker -> Done
+Connection -> Done
+Minus Delete -> Done
 */
 
 /* -------------------------------------------------------------*/
@@ -238,7 +239,7 @@ int checker(char **equation) {
         lenEquation++;
     }
 
-    if (lenEquation == numberStr && (equation[0][0] == '#' | equation[lenEquation-1][0] == '#')) {
+    if (lenEquation == numberStr && (equation[0][0] == '#' || equation[lenEquation-1][0] == '#')) {
         return -1;
 
     } else if (lenEquation == numberStr) {
@@ -340,20 +341,27 @@ int operandProcessor(char ***mainArray, int mainIndex, char **equation ,char *wo
 /* ------------------------------------------------------------------------------------ */
 /* ------------------------------------- Main ----------------------------------------- */
 int main() {
-    int futureIndex = 0, equationIndex;
-    int comma = 0, i = 0;
+    int futureIndex = 0, equationIndex, lenComing;
+    int comma = 0, i = 0, pFirst = 0, pSec = 0, minuss = 0;
     int opening = 0, closing, arrIndex = 0;
 
     futureSolved = (char ***) malloc(1*sizeof(char**)); /* At first we have only one equation so.. AND array size == TOBESOLVED*/
     scanf("%s", inComing); /* Taking string as input */
+    lenComing = strlen(inComing);
 
     while (inComing[i] != '\0') {
-        if (inComing[i] == ',' | inComing[i] == '#') {
+        if (inComing[i] == ',' || inComing[i] == '#') {
             comma++;
         }
         i++;
     }
-    firstEquation = (char **) malloc((comma+3)*sizeof(char*));  /* Number of , and # + 3 */
+
+    if (inComing[0] == '#' || inComing[lenComing-1] == '#') {
+        firstEquation = (char **) malloc((comma+2)*sizeof(char*));  /* Number of , and # + 3 */
+    } else {
+        firstEquation = (char **) malloc((comma+3)*sizeof(char*));  /* Number of , and # + 3 */
+    }
+
 
 
     /*   char*** -> char** -> X times char*   */
@@ -419,8 +427,8 @@ int main() {
         last[i - opening] = '\0';
         firstEquation[arrIndex] = last;
         arrIndex++;
-        firstEquation[arrIndex] = NULL;
     }
+    firstEquation[arrIndex] = NULL;
     
     futureSolved[0] = firstEquation;
 
@@ -428,16 +436,15 @@ int main() {
     while (ssf[1] < ssf[0]) {
         while (futureIndex < ssf[0]) {
             int LR = -1, result;
+            
             for (equationIndex = 0; futureSolved[futureIndex][equationIndex] != NULL; equationIndex++) {
                 int op;
 
                 if (futureSolved[futureIndex][equationIndex][0] == '#') {
-                    printf("%s %d %d\n", futureSolved[futureIndex][equationIndex], equationIndex, futureIndex);
                     LR = 1;
                 } else {
-                    printf("%s %d %d\n", futureSolved[futureIndex][equationIndex],equationIndex, futureIndex);
                     op = operandProcessor(futureSolved, futureIndex, futureSolved[futureIndex], futureSolved[futureIndex][equationIndex], LR, equationIndex);
-                    printf("%s %d %d\n", futureSolved[futureIndex][equationIndex],equationIndex, futureIndex);
+
                     if (op == 0) {
                         break;
                     }
@@ -446,15 +453,32 @@ int main() {
             result = checker(futureSolved[futureIndex]);
 
             if (result == 1) {
+                int kk;
+
+                for(kk = 0; futureSolved[futureIndex][kk] != NULL; kk++) {
+                    free(futureSolved[futureIndex][kk]);
+                }
+                free(futureSolved[futureIndex]);
                 futureIndex++;
+
             } else if (result == -1) {
+                int f,s;
+                
+                for(f = futureIndex; f < ssf[0]; f++) {
+                    for (s = 0; futureSolved[f][s] != NULL; s++) {
+                        free(futureSolved[f][s]); /*Free char* first */
+                    }
+                    free(futureSolved[f]); /* Free char** second */
+                }
+                free(futureSolved); /* Free char*** third */
+
                 printf("F\n");
                 return 0;
             }
         }
     }
-    /* DO NOT FORGET CLEANER FUNCTION */
 
+    free(futureSolved);
     printf("T\n");
 
     return 0;
