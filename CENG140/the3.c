@@ -43,13 +43,34 @@ char* spaceDeleter(char* word) {
     return result;
 }
 
+/* 
+float float_rand( float min, float max ) {
+    float scale = rand() / (float) RAND_MAX;    [0, 1.0] 
+    return min + scale * ( max - min );         [min, max]
+} 
+*/
 
 /* Random Number Generator */
-void randomNumbers(int **probArr, float* values) {
+void randomNumbers(float **limits ,int **probArr, float* values, int amount, int numberOfIntervals) {
+    int i;
 
+    for (i = 0; i < amount; i++) {
+        int interval, numberIndex;
+        float normalize, intervalRange, lower, upper, min, max;
 
+        normalize = rand() / (float) RAND_MAX;
+        lower = limits[i][0];
+        upper = limits[i][1];
+        numberIndex = rand() % 1000;
+        interval = probArr[i][numberIndex];
+        intervalRange = (upper - lower) / numberOfIntervals;
+        
+        min = lower + ((interval-1) * intervalRange);
+        max = lower + (interval * intervalRange);
 
-
+        values[i] = min + normalize * ( max - min );
+        /* printf("min: %f max: %f value: %f, on interval: %d\n", min, max, values[i], interval); */
+    }
 }
 
 
@@ -62,6 +83,8 @@ int main () {
     float **features, *currentValues;
     int index = 0, j;
     int **probabiltyArrays;
+
+    srand(time(NULL));
 
     scanf("%[^\n]s", inComing); /*Take input until see newline character */
     scanf("%d %ld", &intervalCount, &experimentCount);
@@ -97,10 +120,9 @@ int main () {
 
         }
     } /*Inputs were taken */
-
-
+    letterCount--;
     Formula = spaceDeleter(inComing);
-
+    
     currentValues = (float*) malloc(letterCount * sizeof(float));
     probabiltyArrays = (int**) malloc(letterCount * sizeof(int));
 
@@ -110,12 +132,13 @@ int main () {
         probs = (int*) malloc(1000 * sizeof(int));
 
         for (k = 1; k < intervalCount+1; k++) {
-            int count = features[j][k+1] * 1000;
+            int count = features[j][k+1] * 1000, deneme = 0;
             int l;
 
             for (l = 0; l < count; l++) {
                 probs[m] = k;
                 m++;
+                deneme++;
             }
         }
         probabiltyArrays[j] = probs;
@@ -123,8 +146,11 @@ int main () {
 
     /* Now we have an array of 1000 integers like [1,1,1,1,2,2,2,3,3] */
 
-    randomNumbers(probabiltyArrays, currentValues); /*Create random values for each letter */
-
+    index = 0;
+    while (index < experimentCount) {
+        randomNumbers(features, probabiltyArrays, currentValues, letterCount, intervalCount); /*Create random values for each letter */
+        index++;
+    }
 
 
     return 0;
