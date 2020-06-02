@@ -11,7 +11,7 @@ long int experimentCount;
 /*
 1) Delete spaces -> DONE 
 2) Dijkstra’s algorithm
-3) Random number generation with weighted probabilities
+3) Random number generation with weighted probabilities -> DONE
 4) 3 precision for input, may use double for output?  (TAKING AS FLOAT SO 5 PRECISION)
 5) Normalizing input probabilty distribution and outcome probabilty distribution since their summation may not equal to 1 ? 
 
@@ -75,6 +75,210 @@ void randomNumbers(float **limits ,int **probArr, float* values, int amount, int
 
 
 
+/* 
+    s -> sin;
+    r -> sqrt;
+    l -> ln;
+    c -> cos;
+*/
+
+int precedenceCompare(char operator) {
+    if (operator == 's') return 3;
+    else if (operator == 'r') return 3;
+    else if (operator == 'l') return 3;
+    else if (operator == 'c') return 3;
+    else if (operator == '~') return 3;
+    else if (operator == '^') return 3;
+    else if (operator == '*') return 2;
+    else if (operator == '/') return 2;
+    else if (operator == '-') return 1;
+    else if (operator == '+') return 1;
+    else if (operator == '(') return 0;
+}
+
+
+char* infixToPostfix(char* comingFormula) {
+    char stack[201];
+    int length = strlen(comingFormula), formulaP = 0, resultP = 0, stackP = 0;
+    char* result;
+
+    result = (char*) malloc((resultP+1) * sizeof(char*));
+
+    while (formulaP < length) {
+        char ch = comingFormula[formulaP];
+        if (ch == '(') {
+            stack[stackP] = '(';
+            stackP++;
+            formulaP++;
+
+        } else if (ch == ')') {
+            stackP--;
+            while (stack[stackP] != '(') {
+                result[resultP] = stack[stackP];
+                stackP--;
+                resultP++;
+                result = (char*) realloc(result, (resultP+1) * sizeof(char));
+            }
+            formulaP++;
+
+        } else if (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '^') {
+            if (stackP > 0) {
+                if (precedenceCompare(ch) > precedenceCompare(stack[stackP-1])) {
+                    stack[stackP] = ch;
+                    stackP++;
+                } else {
+                    stackP--;
+                    result[resultP] = stack[stackP];
+                    stack[stackP] = ch;
+                    resultP++;
+                    stackP++;
+                    result = (char*) realloc(result, (resultP+1) * sizeof(char));
+                }
+
+            } else {
+                stack[stackP] = ch;
+                stackP++;
+            }
+            formulaP++;
+
+        } else if ('0' <= ch && '9' >= ch) {
+            result[resultP] = '#';
+            resultP++; 
+            result = (char*) realloc(result, (resultP+1) * sizeof(char));
+
+            while (('0' <= comingFormula[formulaP] && '9' >= comingFormula[formulaP]) || comingFormula[formulaP] == '.') {
+                result[resultP] = comingFormula[formulaP];
+                resultP++;
+                formulaP++;
+                result = (char*) realloc(result, (resultP+1) * sizeof(char));
+            }
+            result[resultP] = '#';
+            resultP++;
+            result = (char*) realloc(result, (resultP+1) * sizeof(char));
+
+
+        } else if (ch == '~' || ch == 's' || ch == 'c' || ch == 'l') {
+            if (ch == 's' && comingFormula[formulaP+2] == 'n') { /* IF sinus function */
+                if (stackP > 0) {
+                    if (precedenceCompare(ch) > precedenceCompare(stack[stackP-1])) {
+                        stack[stackP] = 's';
+                        stackP++;
+                    } else {
+                        stackP--;
+                        result[resultP] = stack[stackP];
+                        stack[stackP] = 's';
+                        resultP++;
+                        stackP++;
+                        result = (char*) realloc(result, (resultP+1) * sizeof(char));
+                    }
+
+                } else {
+                    stack[stackP] = 's';
+                    stackP++;
+                }
+                formulaP+=3;
+
+
+            } else if (ch == 's' && comingFormula[formulaP+2] == 'r') {
+                if (stackP > 0) {
+                    if (precedenceCompare(ch) > precedenceCompare(stack[stackP-1])) {
+                        stack[stackP] = 'r';
+                        stackP++;
+                    } else {
+                        stackP--;
+                        result[resultP] = stack[stackP];
+                        stack[stackP] = 'r';
+                        resultP++;
+                        stackP++;
+                        result = (char*) realloc(result, (resultP+1) * sizeof(char));
+                    }
+
+                } else {
+                    stack[stackP] = 'r';
+                    stackP++;
+                }
+                formulaP+=4;
+
+            } else if (ch == 'c') {
+                if (stackP > 0) {
+                    if (precedenceCompare(ch) > precedenceCompare(stack[stackP-1])) {
+                        stack[stackP] = 'c';
+                        stackP++;
+                    } else {
+                        stackP--;
+                        result[resultP] = stack[stackP];
+                        stack[stackP] = 'c';
+                        resultP++;
+                        stackP++;
+                        result = (char*) realloc(result, (resultP+1) * sizeof(char));
+                    }
+
+                } else {
+                    stack[stackP] = 'c';
+                    stackP++;
+                }
+                formulaP+=3;
+
+            } else if (ch == 'l') {
+                if (stackP > 0) {
+                    if (precedenceCompare(ch) > precedenceCompare(stack[stackP-1])) {
+                        stack[stackP] = 'l';
+                        stackP++;
+                    } else {
+                        stackP--;
+                        result[resultP] = stack[stackP];
+                        stack[stackP] = 'l';
+                        resultP++;
+                        stackP++;
+                        result = (char*) realloc(result, (resultP+1) * sizeof(char));
+                    }
+
+                } else {
+                    stack[stackP] = 'l';
+                    stackP++;
+                }
+                formulaP+=2;
+
+            } else if (ch == '~') {
+                if (stackP > 0) {
+                    if (precedenceCompare(ch) > precedenceCompare(stack[stackP-1])) {
+                        stack[stackP] = '~';
+                        stackP++;
+                    } else {
+                        stackP--;
+                        result[resultP] = stack[stackP];
+                        stack[stackP] = '~';
+                        resultP++;
+                        stackP++;
+                        result = (char*) realloc(result, (resultP+1) * sizeof(char));
+                    }
+
+                } else {
+                    stack[stackP] = '~';
+                    stackP++;
+                }
+                formulaP++;
+            }
+        } else if(ch >= 'A' && ch <= 'Z') {
+            result[resultP] = ch;
+            resultP++;
+            formulaP++;
+            result = (char*) realloc(result, (resultP+1) * sizeof(char));
+        }
+
+    }
+
+    stackP--;
+    while(stackP >= 0) {
+        result[resultP] = stack[stackP];
+        stackP--;
+        resultP++;
+        result = (char*) realloc(result, (resultP+1) * sizeof(char));
+    }
+
+    return result;
+}
+
 
 /* Main Function */
 int main () {
@@ -132,13 +336,12 @@ int main () {
         probs = (int*) malloc(1000 * sizeof(int));
 
         for (k = 1; k < intervalCount+1; k++) {
-            int count = features[j][k+1] * 1000, deneme = 0;
+            int count = features[j][k+1] * 1000;
             int l;
 
             for (l = 0; l < count; l++) {
                 probs[m] = k;
                 m++;
-                deneme++;
             }
         }
         probabiltyArrays[j] = probs;
@@ -152,6 +355,7 @@ int main () {
         index++;
     }
 
+    printf("%s\n",infixToPostfix(Formula));
 
     return 0;
 }
