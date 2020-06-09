@@ -7,6 +7,10 @@
 char inComing[201];
 int intervalCount, letterCount = 1;
 long int experimentCount;
+float *currentValues;
+char *variableNames;
+int **probabiltyArrays;
+float **features;
 
 /*
 1) Delete spaces -> DONE 
@@ -51,7 +55,7 @@ float float_rand( float min, float max ) {
 */
 
 /* Random Number Generator */
-void randomNumbers(float **limits ,int **probArr, float* values, int amount, int numberOfIntervals) {
+void randomNumbers(int amount, int numberOfIntervals) {
     int i;
 
     for (i = 0; i < amount; i++) {
@@ -59,21 +63,19 @@ void randomNumbers(float **limits ,int **probArr, float* values, int amount, int
         float normalize, intervalRange, lower, upper, min, max;
 
         normalize = rand() / (float) RAND_MAX;
-        lower = limits[i][0];
-        upper = limits[i][1];
+        lower = features[i][0];
+        upper = features[i][1];
         numberIndex = rand() % 1000;
-        interval = probArr[i][numberIndex];
+        interval = probabiltyArrays[i][numberIndex];
         intervalRange = (upper - lower) / numberOfIntervals;
         
         min = lower + ((interval-1) * intervalRange);
         max = lower + (interval * intervalRange);
 
-        values[i] = min + normalize * ( max - min );
+        currentValues[i] = min + normalize * ( max - min );
         /* printf("min: %f max: %f value: %f, on interval: %d\n", min, max, values[i], interval); */
     }
 }
-
-
 
 /* 
     s -> sin;
@@ -81,8 +83,6 @@ void randomNumbers(float **limits ,int **probArr, float* values, int amount, int
     l -> ln;
     c -> cos;
 */
-
-
 int precedenceCompare(char operator) {
     if (operator == 's') return 4;
     else if (operator == 'r') return 4;
@@ -105,7 +105,7 @@ char* infixToPostfix(char* comingFormula) {
     int length = strlen(comingFormula), formulaP = 0, resultP = 0, stackP = 0;
     char* result;
 
-    result = (char*) malloc((resultP+1) * sizeof(char*));
+    result = (char*) malloc((resultP+1) * sizeof(char));
 
     while (formulaP < length) {
         char ch = comingFormula[formulaP];
@@ -319,11 +319,12 @@ char* infixToPostfix(char* comingFormula) {
         result = (char*) realloc(result, (resultP+1) * sizeof(char));
     }
 
+    result[resultP] = '\0';
     return result;
 }
 
 
-double postfixEvaluater(char* postfixversion, float* values, char* letters, int numberLetter) {
+double postfixEvaluater(char* postfixversion, int numberLetter) {
     double stack[200];
     int stackP = 0, postfixP = 0, length = strlen(postfixversion);
 
@@ -358,32 +359,75 @@ double postfixEvaluater(char* postfixversion, float* values, char* letters, int 
             int i;
 
             for (i = 0; i < numberLetter; i++) {
-                if(letters[i] == ch) {
-                    stack[stackP] = values[i];
+                if(variableNames[i] == ch) {
+                    stack[stackP] = currentValues[i];
                     stackP++;
+                    break;
                 }
             }
             postfixP++;
 
+        /* If an operator or function comes */
         } else if (ch == '*') {
+            stackP--;
+            stack[stackP-1] = stack[stackP-1] * stack[stackP];
+            postfixP++;
+
+        } else if (ch == '/') {
+            stackP--;
+            stack[stackP-1] = stack[stackP-1] / stack[stackP];
+            postfixP++;
+
+        } else if (ch == '-') {
+            stackP--;
+            stack[stackP-1] = stack[stackP-1] - stack[stackP];
+            postfixP++;
+
+        } else if (ch == '+') {
+            stackP--;
+            stack[stackP-1] = stack[stackP-1] + stack[stackP];
+            postfixP++;
+            
+        } else if (ch == '^') {
+            stackP--;
+            stack[stackP-1] = pow(stack[stackP-1], stack[stackP]);
+            postfixP++;
+            
+        } else if (ch == 's') {
+            stack[stackP-1] = sin(stack[stackP-1]);
+            postfixP++;
+            
+        } else if (ch == 'c') {
+            stack[stackP-1] = cos(stack[stackP-1]);
+            postfixP++;
+            
+        } else if (ch == 'l') {
+            stack[stackP-1] = log(stack[stackP-1]);
+            postfixP++;
+            
+        } else if (ch == 'r') {
+            stack[stackP-1] = sqrt(stack[stackP-1]);
+            postfixP++;
+            
+        } else if (ch == '~') {
+            stack[stackP-1] = -(stack[stackP-1]);
+            postfixP++;
             
         }
-    
-
-
-
+        /* End of operators and functions */
     }
-
+    
+    return stack[0];
 }
+
 
 
 /* Main Function */
 int main () {
     char *Formula;
-    char *variableNames;
-    float **features, *currentValues;
     int index = 0, j;
-    int **probabiltyArrays;
+    double minimum, maximum, *result;
+    float intervalSize;
 
     srand(time(NULL));
 
@@ -425,7 +469,7 @@ int main () {
     Formula = spaceDeleter(inComing);
     
     currentValues = (float*) malloc(letterCount * sizeof(float));
-    probabiltyArrays = (int**) malloc(letterCount * sizeof(int));
+    probabiltyArrays = (int**) malloc(letterCount * sizeof(int*));
 
     for (j = 0; j < letterCount; j++) {
         int *probs, k, m = 0;
@@ -446,16 +490,67 @@ int main () {
 
     /* Now we have an array of 1000 integers like [1,1,1,1,2,2,2,3,3] */
 
+
+
+    Formula = infixToPostfix(Formula);
+
+    /*Take minimum and maximum to compare with others */
+    randomNumbers(letterCount, intervalCount);
+    minimum = postfixEvaluater(Formula, letterCount);
+    maximum = minimum;
+
+    /* We have just made 1 experiment so experiment -1 more should be done */
     index = 0;
-    while (index < experimentCount) {
-        randomNumbers(features, probabiltyArrays, currentValues, letterCount, intervalCount); /*Create random values for each letter */
+    while (index < experimentCount-1) {
+        double functionVal;
+
+        randomNumbers(letterCount, intervalCount); /*Create random values for each letter */
+        functionVal = postfixEvaluater(Formula, letterCount);
+
+        if (functionVal > maximum) {
+            maximum = functionVal;
+        } else if (functionVal < minimum) {
+            minimum = functionVal;
+        }
+        
         index++;
     }
 
-    printf("%s\n",infixToPostfix(Formula));
-    Formula = infixToPostfix(Formula);
+    /* To place values into intervals one more time same experiment */
+    result = (double*) calloc((intervalCount), sizeof(double));
+    intervalSize = (maximum-minimum) / intervalCount;
+    index = 0;
+    while (index < experimentCount) {
+        double functionVal;
+        int interval;
 
-    postfixEvaluater(Formula,currentValues, variableNames, letterCount);
+        randomNumbers(letterCount, intervalCount); /*Create random values for each letter */
+        functionVal = postfixEvaluater(Formula, letterCount);
+
+        if (functionVal > maximum) {
+            result[intervalCount-1]++;
+        } else if (functionVal < minimum) {
+            result[0]++;
+        } else {
+            interval = (int) ((functionVal - minimum) / intervalSize);
+            result[interval]++;
+        }
+        
+        index++;
+    }
+
+
+    printf("%.3f %.3f ", minimum, maximum);
+
+    for (index = 0; index < intervalCount; index++) {
+        if(index != intervalCount-1) {
+            printf("%.3f ", result[index]/experimentCount);
+        } else {
+            printf("%.3f\n", result[index]/experimentCount);
+        }
+    }
+    
+
 
     return 0;
 }
