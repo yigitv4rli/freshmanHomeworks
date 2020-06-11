@@ -141,11 +141,16 @@ char* infixToPostfix(char* comingFormula) {
                 
                 } else {
                     while (stackP > 0 && precedenceCompare(ch) <= precedenceCompare(stack[stackP-1])) {
-                        stackP--;
-                        result[resultP] = stack[stackP];
-                        stack[stackP] = ch;
-                        resultP++;
-                        result = (char*) realloc(result, (resultP+1) * sizeof(char));
+                        if (ch == '^' && stack[stackP-1] == '^') {
+                            stack[stackP] = '^';
+                            break;
+                        } else {
+                            stackP--;
+                            result[resultP] = stack[stackP];
+                            stack[stackP] = ch;
+                            resultP++;
+                            result = (char*) realloc(result, (resultP+1) * sizeof(char));
+                        }
                     }
                     stackP++;
                 }
@@ -506,8 +511,10 @@ int main () {
 
         randomNumbers(letterCount, intervalCount); /*Create random values for each letter */
         functionVal = postfixEvaluater(Formula, letterCount);
-
-        if (functionVal > maximum) {
+        
+        if (isnan(functionVal)) {
+            ;
+        } else if (functionVal > maximum) {
             maximum = functionVal;
         } else if (functionVal < minimum) {
             minimum = functionVal;
@@ -527,7 +534,9 @@ int main () {
         randomNumbers(letterCount, intervalCount); /*Create random values for each letter */
         functionVal = postfixEvaluater(Formula, letterCount);
 
-        if (functionVal > maximum) {
+        if (isnan(functionVal)) {
+            ;
+        } else if (functionVal > maximum) {
             result[intervalCount-1]++;
         } else if (functionVal < minimum) {
             result[0]++;
