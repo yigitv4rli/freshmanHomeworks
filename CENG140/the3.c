@@ -27,24 +27,24 @@ Making struct Value is logical??
 /* To Delete Spaces*/
 char* spaceDeleter(char* word) {
     int i = 0, j = 0, len;
-    char* result;
+    char* results;
 
-    result = (char*) malloc(201 * sizeof(char));
+    results = (char*) malloc(201 * sizeof(char));
 
     while (word[i]!= '\0') {
         if (word[i] != ' ') {
-            result[j] = word[i];
+            results[j] = word[i];
             j++;
             i++;
         } else {
             i++;
         }
     }
-    len = strlen(result);
-    result = (char*) realloc(result, (len+1) * sizeof(char));
+    len = strlen(results);
+    results = (char*) realloc(results, (len+1) * sizeof(char));
 
-    result[len] = '\0';
-    return result;
+    results[len] = '\0';
+    return results;
 }
 
 /* 
@@ -103,9 +103,9 @@ int precedenceCompare(char operator) {
 char* infixToPostfix(char* comingFormula) {
     char stack[201];
     int length = strlen(comingFormula), formulaP = 0, resultP = 0, stackP = 0;
-    char* result;
+    char* resulti;
 
-    result = (char*) malloc((resultP+1) * sizeof(char));
+    resulti = (char*) malloc(450 * sizeof(char));
 
     while (formulaP < length) {
         char ch = comingFormula[formulaP];
@@ -118,10 +118,9 @@ char* infixToPostfix(char* comingFormula) {
         } else if (ch == ')') {
             stackP--;
             while (stack[stackP] != '(') {
-                result[resultP] = stack[stackP];
+                resulti[resultP] = stack[stackP];
                 stackP--;
                 resultP++;
-                result = (char*) realloc(result, (resultP+1) * sizeof(char));
             }
             formulaP++;
 
@@ -146,10 +145,9 @@ char* infixToPostfix(char* comingFormula) {
                             break;
                         } else {
                             stackP--;
-                            result[resultP] = stack[stackP];
+                            resulti[resultP] = stack[stackP];
                             stack[stackP] = ch;
                             resultP++;
-                            result = (char*) realloc(result, (resultP+1) * sizeof(char));
                         }
                     }
                     stackP++;
@@ -165,10 +163,9 @@ char* infixToPostfix(char* comingFormula) {
                 } else {
                     while (stackP > 0 && precedenceCompare(ch) <= precedenceCompare(stack[stackP-1])) {
                         stackP--;
-                        result[resultP] = stack[stackP];
+                        resulti[resultP] = stack[stackP];
                         stack[stackP] = ch;
                         resultP++;
-                        result = (char*) realloc(result, (resultP+1) * sizeof(char));
                     }
                     stackP++;
                 }
@@ -180,19 +177,16 @@ char* infixToPostfix(char* comingFormula) {
             formulaP++;
 
         } else if ('0' <= ch && '9' >= ch) {
-            result[resultP] = '#';
+            resulti[resultP] = '#';
             resultP++; 
-            result = (char*) realloc(result, (resultP+1) * sizeof(char));
 
             while (('0' <= comingFormula[formulaP] && '9' >= comingFormula[formulaP]) || comingFormula[formulaP] == '.') {
-                result[resultP] = comingFormula[formulaP];
+                resulti[resultP] = comingFormula[formulaP];
                 resultP++;
                 formulaP++;
-                result = (char*) realloc(result, (resultP+1) * sizeof(char));
             }
-            result[resultP] = '#';
+            resulti[resultP] = '#';
             resultP++;
-            result = (char*) realloc(result, (resultP+1) * sizeof(char));
 
 
         } else if (ch == '~' || ch == 's' || ch == 'c' || ch == 'l') {
@@ -204,10 +198,9 @@ char* infixToPostfix(char* comingFormula) {
                     } else {
                         while (stackP > 0 && precedenceCompare(ch) <= precedenceCompare(stack[stackP-1])) {
                             stackP--;
-                            result[resultP] = stack[stackP];
+                            resulti[resultP] = stack[stackP];
                             stack[stackP] = ch;
                             resultP++;
-                            result = (char*) realloc(result, (resultP+1) * sizeof(char));
                         }
                         stackP++;
                     }
@@ -227,10 +220,9 @@ char* infixToPostfix(char* comingFormula) {
                     } else {
                         while (stackP > 0 && precedenceCompare(ch) <= precedenceCompare(stack[stackP-1])) {
                             stackP--;
-                            result[resultP] = stack[stackP];
+                            resulti[resultP] = stack[stackP];
                             stack[stackP] = ch;
                             resultP++;
-                            result = (char*) realloc(result, (resultP+1) * sizeof(char));
                         }
                         stackP++;
                     }
@@ -249,10 +241,9 @@ char* infixToPostfix(char* comingFormula) {
                     } else {
                         while (stackP > 0 && precedenceCompare(ch) <= precedenceCompare(stack[stackP-1])) {
                             stackP--;
-                            result[resultP] = stack[stackP];
+                            resulti[resultP] = stack[stackP];
                             stack[stackP] = ch;
                             resultP++;
-                            result = (char*) realloc(result, (resultP+1) * sizeof(char));
                         }
                         stackP++;
                     }
@@ -271,10 +262,9 @@ char* infixToPostfix(char* comingFormula) {
                     } else {
                         while (stackP > 0 && precedenceCompare(ch) <= precedenceCompare(stack[stackP-1])) {
                             stackP--;
-                            result[resultP] = stack[stackP];
+                            resulti[resultP] = stack[stackP];
                             stack[stackP] = ch;
                             resultP++;
-                            result = (char*) realloc(result, (resultP+1) * sizeof(char));
                         }
                         stackP++;
                     }
@@ -293,10 +283,9 @@ char* infixToPostfix(char* comingFormula) {
                     } else {
                         while (stackP > 0 && precedenceCompare(ch) <= precedenceCompare(stack[stackP-1])) {
                             stackP--;
-                            result[resultP] = stack[stackP];
+                            resulti[resultP] = stack[stackP];
                             stack[stackP] = ch;
                             resultP++;
-                            result = (char*) realloc(result, (resultP+1) * sizeof(char));
                         }
                         stackP++;
                     }
@@ -308,24 +297,22 @@ char* infixToPostfix(char* comingFormula) {
                 formulaP++;
             }
         } else if(ch >= 'A' && ch <= 'Z') {
-            result[resultP] = ch;
+            resulti[resultP] = ch;
             resultP++;
             formulaP++;
-            result = (char*) realloc(result, (resultP+1) * sizeof(char));
         }
 
     }
 
     stackP--;
     while(stackP >= 0) {
-        result[resultP] = stack[stackP];
+        resulti[resultP] = stack[stackP];
         stackP--;
         resultP++;
-        result = (char*) realloc(result, (resultP+1) * sizeof(char));
     }
 
-    result[resultP] = '\0';
-    return result;
+    resulti[resultP] = '\0';
+    return resulti;
 }
 
 
@@ -337,7 +324,7 @@ double postfixEvaluater(char* postfixversion, int numberLetter) {
         char ch = postfixversion[postfixP];
 
         if (ch == '#') {
-            char* numberString;
+            char numberString[200];
             int lenDouble = 0, i;
             double number;
             postfixP++;
@@ -346,8 +333,6 @@ double postfixEvaluater(char* postfixversion, int numberLetter) {
                 lenDouble++;
                 postfixP++;
             }
-
-            numberString = (char*) malloc((lenDouble+1) * sizeof(char));
 
             for(i = 0; i < lenDouble; i++) {
                 numberString[i] = postfixversion[postfixP - lenDouble + i];
@@ -532,9 +517,9 @@ int main () {
         randomNumbers(letterCount, intervalCount); /*Create random values for each letter */
         functionVal = postfixEvaluater(Formula, letterCount);
 
-        if (functionVal > maximum) {
+        if (functionVal >= maximum) {
             result[intervalCount-1]++;
-        } else if (functionVal < minimum) {
+        } else if (functionVal <= minimum) {
             result[0]++;
         } else {
             interval = (int) ((functionVal - minimum) / intervalSize);
