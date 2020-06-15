@@ -512,9 +512,7 @@ int main () {
         randomNumbers(letterCount, intervalCount); /*Create random values for each letter */
         functionVal = postfixEvaluater(Formula, letterCount);
         
-        if (isnan(functionVal)) {
-            ;
-        } else if (functionVal > maximum) {
+        if (functionVal > maximum) {
             maximum = functionVal;
         } else if (functionVal < minimum) {
             minimum = functionVal;
@@ -534,9 +532,7 @@ int main () {
         randomNumbers(letterCount, intervalCount); /*Create random values for each letter */
         functionVal = postfixEvaluater(Formula, letterCount);
 
-        if (isnan(functionVal)) {
-            ;
-        } else if (functionVal > maximum) {
+        if (functionVal > maximum) {
             result[intervalCount-1]++;
         } else if (functionVal < minimum) {
             result[0]++;
